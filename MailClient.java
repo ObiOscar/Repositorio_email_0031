@@ -55,4 +55,10 @@ public class MailClient
         MailItem item = new MailItem(user, to, asunto, message);
         server.post(item);
     }
+    
+    public void numeroDeEmailServidor(){
+
+        System.out.println("Número de correos pendientes: " + server.howManyMailItems(user));
+    
+    }
 }
