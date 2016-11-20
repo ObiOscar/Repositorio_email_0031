@@ -11,6 +11,11 @@ public class MailClient
     private MailServer server;
     // The user running this client.
     private String user;
+    
+    private boolean respuestaAutomatica; // atributo para guardar la respuesta automática
+    private String miTo; // la creo para intentar que salga el destinatario en getNextMailItem
+    private String mensajeAutomatico;   //mensaje automatico 
+    private String asuntoAutomatico;   //mensaje automatico 
 
     /**
      * Create a mail client run by user and attached to the given server.
@@ -19,14 +24,28 @@ public class MailClient
     {
         this.server = server;
         this.user = user;
+        miTo = "";
+        mensajeAutomatico = "Estamos de vacaciones, disculpe las molestias";
+        asuntoAutomatico = "Vacaciones";
     }
 
     /**
-     * Return the next mail item (if any) for this user.
+     * No consigo que cuando se llame a este metodo devuelva el destinatario antiguo como remitente.
      */
-    public MailItem getNextMailItem()
+    public void getNextMailItem()
     {
-        return server.getNextMailItem(user);
+
+        if(respuestaAutomatica){
+         MailItem item2 = new MailItem(user,miTo,asuntoAutomatico,mensajeAutomatico); 
+         miTo = item2.getFrom();    // miTo no consigo ver el remitente
+         MailItem item = new MailItem(user,miTo,asuntoAutomatico,mensajeAutomatico); 
+
+          sendMailItem(miTo,asuntoAutomatico,mensajeAutomatico); 
+          item.print();         
+        }
+        else{
+         System.out.println("Error.Activa el modo automático");          
+        }
     }
 
     /**
@@ -51,14 +70,39 @@ public class MailClient
      * @param message The text of the message to be sent.
      */
     public void sendMailItem(String to, String asunto, String message)
-    {
-        MailItem item = new MailItem(user, to, asunto, message);
+    {   
+        miTo = to; // la creo para intentar que salga el destinatario en getNextMailItem
+
+        MailItem item = new MailItem(user, miTo, asunto, message);
         server.post(item);
     }
     
+        /**
+         * Se cuantos e-mail estan pendientes de leer
+     */
     public void numeroDeEmailServidor(){
 
         System.out.println("Número de correos pendientes: " + server.howManyMailItems(user));
     
     }
+    
+     /**
+     * Activa o desactiva el correo automático
+     * //Escribe true para activar los correos automáticos, false para desactivarlos.
+     */
+    public void respuestaAutomatica(boolean respuestaAutomatica)
+    {
+        this.respuestaAutomatica = respuestaAutomatica;
+    }
+    
+     /**
+     * Cambia el mensaje de la respuesta automatica
+     * //Escribe entre "" el nuevoasunto y el nuevo mensaje.
+     */
+    public void cambiarRespuestaAutomatica(String NuevoAsuntoAutomatico, String NuevoMensajeAutomatico)
+    {
+        asuntoAutomatico = NuevoAsuntoAutomatico;
+        mensajeAutomatico = NuevoMensajeAutomatico;   
+    }
 }
+
